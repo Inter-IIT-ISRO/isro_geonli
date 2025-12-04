@@ -1,0 +1,9 @@
+unsloth
+transformers==4.57.0
+fastapi
+uvicorn
+gunicorn
+Pillow
+httpx
+
+# pip install --no-deps trl==0.22.2

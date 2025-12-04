@@ -1,0 +1,4 @@
+qwen_lora_model/
+env_qwen/
+__pycache__/
+unsloth_compiled_cache/
