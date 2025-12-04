@@ -161,8 +161,11 @@ export default function MainChat() {
   const handleSendMessage = async (query) => {
     if (!currentChatId || !query.trim()) return;
     
+    // Store start time in local variable (not just state) for accurate calculation
+    const queryStartTime = Date.now();
+    
     setIsGenerating(true);
-    setGenerationStartTime(Date.now());
+    setGenerationStartTime(queryStartTime);
     setElapsedTime(0);
     setLastResponseTime(null);
     setError(null);
@@ -234,9 +237,8 @@ export default function MainChat() {
           completed = true;
           
           const data = JSON.parse(event.data);
-          const responseTime = generationStartTime 
-            ? ((Date.now() - generationStartTime) / 1000).toFixed(1) 
-            : data.response_time;
+          // Use local queryStartTime instead of state
+          const responseTime = ((Date.now() - queryStartTime) / 1000).toFixed(1);
           const currentReasoningTime = reasoningEndTime || (reasoning && reasoningStartTime ? ((Date.now() - reasoningStartTime) / 1000).toFixed(1) : null);
           
           setLastResponseTime(responseTime);
@@ -299,9 +301,7 @@ export default function MainChat() {
     } else {
       try {
         const response = await generateCompletion(currentChatId, query, trimmedCategory, trimmedTransformedQuery);
-        const responseTime = generationStartTime 
-          ? ((Date.now() - generationStartTime) / 1000).toFixed(1) 
-          : response.data.response_time;
+        const responseTime = ((Date.now() - queryStartTime) / 1000).toFixed(1);
         setLastResponseTime(responseTime);
         const messageIndex = chatHistory.length;
         
