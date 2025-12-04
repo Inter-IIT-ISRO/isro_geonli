@@ -65,6 +65,7 @@ FRONTEND_ENV="$PROJECT_ROOT/frontend/.env"
 cat > "$FRONTEND_ENV" <<EOF
 VITE_API_BASE_URL=http://$HOST_IP:5000/api
 EOF
+VITE_API_BASE_URL="http://$HOST_IP:5000/api"
 
 echo "Frontend configured to talk to: http://$HOST_IP:5000/api"
 
@@ -133,7 +134,7 @@ EOF
         echo "Qwen Port      : $QWEN_PORT"
         echo "SAM Port       : $SAM_PORT"
 
-        export GPU_MACHINE_IP QWEN_PORT SAM_PORT
+        export GPU_MACHINE_IP QWEN_PORT SAM_PORT VITE_API_BASE_URL
 
         echo ""
         echo "Starting Core Services..."
