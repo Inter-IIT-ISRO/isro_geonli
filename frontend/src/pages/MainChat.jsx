@@ -299,7 +299,9 @@ export default function MainChat() {
     } else {
       try {
         const response = await generateCompletion(currentChatId, query, trimmedCategory, trimmedTransformedQuery);
-        const responseTime = response.data.response_time || null;
+        const responseTime = generationStartTime 
+          ? ((Date.now() - generationStartTime) / 1000).toFixed(1) 
+          : response.data.response_time;
         setLastResponseTime(responseTime);
         const messageIndex = chatHistory.length;
         
