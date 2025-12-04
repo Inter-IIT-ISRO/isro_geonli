@@ -98,7 +98,7 @@ export default function MainChat() {
       
       const newWidth = e.clientX;
       // Min width: 300px (ensures logo + "AstraVLM" + collapse button fit), Max width: 450px
-      if (newWidth >= 300 && newWidth <= 450) {
+      if (newWidth >= 260 && newWidth <= 450) {
         setSidebarWidth(newWidth);
       }
     };
