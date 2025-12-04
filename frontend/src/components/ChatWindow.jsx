@@ -60,6 +60,16 @@ export default function ChatWindow({
   const inputBg = theme === "dark" ? "bg-neutral-800" : "bg-gray-50";
   const borderColor = theme === "dark" ? "border-slate-600" : "border-gray-300";
 
+  const formatTime = (seconds) => {
+    const totalSeconds = Math.round(parseFloat(seconds));
+    if (totalSeconds >= 60) {
+      const mins = Math.floor(totalSeconds / 60);
+      const secs = totalSeconds % 60;
+      return secs > 0 ? `${mins}m ${secs}s` : `${mins}m`;
+    }
+    return `${totalSeconds}s`;
+  };
+
   const getThinkingLabel = (reasoningText) => {
     if (!reasoningText) return "Thinking...";
 
@@ -735,7 +745,7 @@ export default function ChatWindow({
                                 <>
                                   <IoChevronDown className="w-3.5 h-3.5" />
                                   <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                                    Thought for {chat.reasoning_time ? `${Math.round(parseFloat(chat.reasoning_time))}s` : '...'}
+                                    Thought for {chat.reasoning_time ? formatTime(chat.reasoning_time) : '...'}
                                   </span>
                                 </>
                               )}
@@ -792,7 +802,7 @@ export default function ChatWindow({
                               ) : (
                                 <>
                                   <IoChevronDown className="w-3.5 h-3.5" />
-                                  <span>Thought for {chat.reasoning_time ? `${Math.round(parseFloat(chat.reasoning_time))} seconds` : (chat.response_time ? `${Math.round(parseFloat(chat.response_time))} seconds` : '...')}</span>
+                                  <span>Thought for {chat.reasoning_time ? formatTime(chat.reasoning_time) : (chat.response_time ? formatTime(chat.response_time) : '...')}</span>
                                 </>
                               )}
                             </button>
@@ -814,10 +824,10 @@ export default function ChatWindow({
                               </span>
                             </div>
                           )}
-                          {chat.response_time && !chat.reasoning && (
+                          {chat.response_time && (
                             <div className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'} flex items-center gap-1.5`}>
                               <AiOutlineClockCircle className="w-4 h-4" />
-                              {Math.round(parseFloat(chat.response_time))}s
+                              {formatTime(chat.response_time)}
                             </div>
                           )}
                         </div>
