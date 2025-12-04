@@ -18,7 +18,7 @@ import axios from "axios";
 export default function MainChat() {
   const [theme, setTheme] = useState("dark");
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [sidebarWidth, setSidebarWidth] = useState(260); // Default to min-width (260px)
+  const [sidebarWidth, setSidebarWidth] = useState(260); 
   const [isResizing, setIsResizing] = useState(false);
   const [isHoveringLogo, setIsHoveringLogo] = useState(false);
   const [currentChatId, setCurrentChatId] = useState(null);
