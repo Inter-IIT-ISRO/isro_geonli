@@ -1,0 +1,93 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: isro_mongodb
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGO_TARGET_DB}
+    volumes:
+      - mongo_data:/data/db
+      - ./mongo-init.js:/mongo-init.js:ro
+      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+
+  minio:
+    image: minio/minio
+    container_name: isro_minio
+    command: server /data --console-address ":9001"
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+    volumes:
+      - minio_data:/data
+  
+  minio-init:
+    image: minio/mc
+    container_name: isro_minio_init
+    depends_on:
+      - minio
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      MINIO_BUCKET: ${MINIO_BUCKET} 
+    entrypoint:
+      - /bin/sh
+      - -c
+      - |
+        # 1. Wait for MinIO to be ready
+        until mc alias set myminio http://minio:9000 $$MINIO_ROOT_USER $$MINIO_ROOT_PASSWORD; do
+          echo '...waiting for minio to start...'
+          sleep 1
+        done
+        
+        # 2. Create the bucket
+        mc mb --ignore-existing myminio/$$MINIO_BUCKET
+        
+        # 3. Set policy to public
+        mc anonymous set download myminio/$$MINIO_BUCKET
+        
+        echo 'Bucket created successfully.'
+        exit 0
+
+  backend:
+    build: ../backend
+    container_name: isro_backend
+    ports:
+      - "5000:5000"
+    environment:
+      PORT: 5000
+      MONGO_URI: mongodb://${MONGO_ROOT_USER}:${MONGO_ROOT_PASSWORD}@mongodb:27017/${MONGO_TARGET_DB}?authSource=admin
+      JWT_SECRET: ${JWT_SECRET}
+      MODE: production
+      DB_NAME: ${MONGO_TARGET_DB}
+      # Use the GPU Machine IP provided in .env
+      INFERENCE_URL_SAM: "${GPU_MACHINE_IP}:${SAM_PORT}"
+      INFERENCE_URL_QWEN: "${GPU_MACHINE_IP}:${QWEN_PORT}"
+      MINIO_ACCESS_KEY: ${MINIO_ROOT_USER}
+      MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD}
+      MINIO_ENDPOINT: ${HOST_IP} # Public IP of this core machine
+      MINIO_PORT: 9000
+      MINIO_BUCKET: ${MINIO_BUCKET}
+      FRONTEND_URL: http://${HOST_IP}:5173
+    depends_on:
+      - mongodb
+      - minio
+
+  frontend:
+    build: ../frontend
+    container_name: isro_frontend
+    ports:
+      - "5173:5173"
+    environment:
+      HOST: 0.0.0.0
+
+volumes:
+  mongo_data:
+  minio_data:

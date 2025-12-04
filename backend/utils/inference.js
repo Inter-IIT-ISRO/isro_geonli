@@ -144,6 +144,7 @@ export const inference = async (inference_url, image_url, query, history, catego
     if (transformed_query) {
         payload['transformed_query'] = transformed_query;
     }
+    console.log("Payload: ",payload)
     return (
         await axios.post(
             inference_url + '/inference',
