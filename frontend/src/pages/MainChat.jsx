@@ -256,7 +256,9 @@ export default function MainChat() {
           completed = true;
           
           const data = JSON.parse(event.data);
-          const responseTime = data.response_time || null;
+          const responseTime = generationStartTime 
+            ? ((Date.now() - generationStartTime) / 1000).toFixed(1) 
+            : data.response_time;
           const currentReasoningTime = reasoningEndTime || (reasoning && reasoningStartTime ? ((Date.now() - reasoningStartTime) / 1000).toFixed(1) : null);
           
           setLastResponseTime(responseTime);
