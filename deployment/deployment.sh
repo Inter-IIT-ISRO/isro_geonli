@@ -80,7 +80,7 @@ case $CHOICE in
     1)
         echo "Starting Single Machine Deployment..."
         # Docker Compose automatically skips containers that are already up-to-date and running
-        docker-compose -f docker-compose.yml up -d --build
+        docker compose -f docker-compose.yml up -d --build
         echo ""
         echo "✅ Deployment Complete!"
         echo "Frontend: http://$HOST_IP:5173"
@@ -137,7 +137,7 @@ EOF
 
         echo ""
         echo "Starting Core Services..."
-        docker-compose -f docker-compose.core.yml up -d --build
+        docker compose -f docker-compose.core.yml up -d --build
 
         echo "🚀 Core Services Running."
         echo "Run 'deployment/start-inference-node.sh' on remote node."
@@ -145,8 +145,8 @@ EOF
 
     3)
         echo "Stopping all containers..."
-        docker-compose -f docker-compose.yml down
-        docker-compose -f docker-compose.core.yml down
+        docker compose -f docker-compose.yml down
+        docker compose -f docker-compose.core.yml down
         # Also try to kill any manual inference containers if they exist locally
         docker rm -f isro_qwen isro_sam 2>/dev/null
         echo "Stopped."
