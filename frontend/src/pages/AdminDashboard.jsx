@@ -9,15 +9,15 @@ export default function AdminDashboard() {
   const [error, setError] = useState(null);
   const [successMessage, setSuccessMessage] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [filterRole, setFilterRole] = useState('all'); // 'all', '1', '2'
-  const [filterWhitelist, setFilterWhitelist] = useState('all'); // 'all', 'true', 'false'
+  const [filterRole, setFilterRole] = useState('all'); 
+  const [filterWhitelist, setFilterWhitelist] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [newUserEmail, setNewUserEmail] = useState('');
   const [isCreating, setIsCreating] = useState(false);
   
   const navigate = useNavigate();
-  const theme = 'dark'; // You can pass theme from parent if needed
+  const theme = 'dark'; 
   const usersPerPage = 10;
 
   useEffect(() => {
@@ -120,7 +120,6 @@ export default function AdminDashboard() {
     }
   };
 
-  // Filter and search logic
   const filteredUsers = users.filter(user => {
     const matchesSearch = user.email.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesRole = filterRole === 'all' || user.role === parseInt(filterRole);
@@ -128,17 +127,14 @@ export default function AdminDashboard() {
     return matchesSearch && matchesRole && matchesWhitelist;
   });
 
-  // Pagination
   const totalPages = Math.ceil(filteredUsers.length / usersPerPage);
   const startIndex = (currentPage - 1) * usersPerPage;
   const paginatedUsers = filteredUsers.slice(startIndex, startIndex + usersPerPage);
 
-  // Reset to page 1 when filters change
   useEffect(() => {
     setCurrentPage(1);
   }, [searchQuery, filterRole, filterWhitelist]);
 
-  // Theme styling variables
   const bgColor = theme === "dark" ? "bg-neutral-900" : "bg-gray-100";
   const cardBg = theme === "dark" ? "bg-neutral-800" : "bg-white";
   const textColor = theme === "dark" ? "text-slate-200" : "text-gray-800";
@@ -149,7 +145,6 @@ export default function AdminDashboard() {
 
   return (
     <div className={`min-h-screen ${bgColor} ${textColor} p-8`}>
-      {/* Header */}
       <div className="max-w-7xl mx-auto">
         <div className="flex items-center gap-4 mb-8">
           <button
@@ -165,7 +160,6 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        {/* Error/Success Messages - Fixed positioned at top */}
         {error && (
           <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 bg-red-600 text-white py-3 px-6 rounded-lg shadow-xl max-w-md">
             {error}
@@ -177,10 +171,8 @@ export default function AdminDashboard() {
           </div>
         )}
 
-        {/* Filters and Actions */}
         <div className={`${cardBg} rounded-lg shadow-lg p-6 mb-6`}>
           <div className="flex flex-wrap gap-4 items-center">
-            {/* Search */}
             <div className="flex-1 min-w-[280px]">
               <input
                 type="text"
@@ -191,7 +183,6 @@ export default function AdminDashboard() {
               />
             </div>
 
-            {/* Role Filter */}
             <div className="relative group">
               <div className={`absolute left-3 top-1/2 -translate-y-1/2 ${secondaryTextColor} text-lg pointer-events-none z-10 transition-colors group-hover:text-blue-500`}>
                 <MdFilterList />
@@ -207,7 +198,6 @@ export default function AdminDashboard() {
               </select>
             </div>
 
-            {/* Whitelist Filter */}
             <div className="relative group">
               <div className={`absolute left-3 top-1/2 -translate-y-1/2 ${secondaryTextColor} text-lg pointer-events-none z-10 transition-colors group-hover:text-green-500`}>
                 <MdFilterList />
@@ -223,7 +213,6 @@ export default function AdminDashboard() {
               </select>
             </div>
 
-            {/* Create User Button */}
             <button
               onClick={() => setShowCreateModal(true)}
               className="flex items-center gap-2 px-6 py-2.5 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white rounded-lg transition-all font-semibold cursor-pointer shadow-md hover:shadow-lg text-sm"
@@ -234,7 +223,6 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        {/* Users Table */}
         <div className={`${cardBg} rounded-lg shadow-lg overflow-hidden`}>
           {loading ? (
             <div className="p-12 text-center">
@@ -328,7 +316,6 @@ export default function AdminDashboard() {
                 </table>
               </div>
 
-              {/* Pagination */}
               {totalPages > 1 && (
                 <div className={`px-6 py-4 flex items-center justify-between border-t ${borderColor} bg-opacity-50`}>
                   <div className={`${secondaryTextColor} text-sm font-medium`}>
@@ -392,7 +379,6 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      {/* Create User Modal */}
       {showCreateModal && (
         <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
           <div className={`${cardBg} rounded-xl shadow-2xl max-w-md w-full p-8 transform transition-all`}>

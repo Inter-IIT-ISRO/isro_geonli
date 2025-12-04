@@ -23,7 +23,6 @@ export default function SharedChat() {
   const textColor = theme === "dark" ? "text-slate-200" : "text-gray-800";
   const secondaryTextColor = theme === "dark" ? "text-slate-400" : "text-gray-600";
 
-  // Timer for tracking generation time
   useEffect(() => {
     if (isGenerating && generationStartTime) {
       const interval = setInterval(() => {
@@ -33,7 +32,6 @@ export default function SharedChat() {
     }
   }, [isGenerating, generationStartTime]);
 
-  // Load shared chat
   useEffect(() => {
     const loadSharedChat = async () => {
       try {
@@ -130,7 +128,6 @@ export default function SharedChat() {
 
   return (
     <div className={`flex flex-col h-screen ${bgColor}`}>
-      {/* Header - Shared Chat Banner */}
       <div className={`flex-shrink-0 px-4 py-3 border-b ${theme === "dark" ? "border-slate-600 bg-neutral-800" : "border-gray-300 bg-white"}`}>
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div>
@@ -150,7 +147,6 @@ export default function SharedChat() {
         </div>
       </div>
 
-      {/* Chat Window */}
       <div className="flex-1 min-h-0 overflow-hidden">
         <ChatWindow 
           chatId={null}

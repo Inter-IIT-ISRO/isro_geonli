@@ -11,7 +11,6 @@ export default function ParticleBackground() {
     let animationFrameId;
     let particles = [];
 
-    // Configuration based on your requirements
     const config = {
       count: 600,
       spread: 20,
@@ -22,7 +21,6 @@ export default function ParticleBackground() {
       disableRotation: true
     };
 
-    // Set canvas size
     const resizeCanvas = () => {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
@@ -30,7 +28,6 @@ export default function ParticleBackground() {
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
 
-    // Particle class - Star-like particles
     class Particle {
       constructor() {
         this.reset();
@@ -50,7 +47,6 @@ export default function ParticleBackground() {
         this.x += this.vx;
         this.y += this.vy;
 
-        // Wrap around screen edges
         if (this.x < 0) this.x = canvas.width;
         if (this.x > canvas.width) this.x = 0;
         if (this.y < 0) this.y = canvas.height;
@@ -58,7 +54,6 @@ export default function ParticleBackground() {
       }
 
       draw() {
-        // Draw white star-like particle (simple circle/dot)
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
         ctx.fillStyle = `rgba(255, 255, 255, ${this.opacity})`;
@@ -66,15 +61,12 @@ export default function ParticleBackground() {
       }
     }
 
-    // Initialize particles
     for (let i = 0; i < config.count; i++) {
       particles.push(new Particle());
     }
 
-    // Animation loop
     const animate = () => {
-      // Clear canvas with dark background
-      ctx.fillStyle = '#0f172a'; // slate-900 background
+      ctx.fillStyle = '#0f172a'; 
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       particles.forEach((particle) => {
@@ -87,7 +79,6 @@ export default function ParticleBackground() {
 
     animate();
 
-    // Cleanup
     return () => {
       window.removeEventListener('resize', resizeCanvas);
       cancelAnimationFrame(animationFrameId);
@@ -100,7 +91,7 @@ export default function ParticleBackground() {
       className="fixed inset-0 w-full h-full"
       style={{ 
         zIndex: 0,
-        backgroundColor: '#0f172a' // slate-900
+        backgroundColor: '#0f172a'
       }}
     />
   );

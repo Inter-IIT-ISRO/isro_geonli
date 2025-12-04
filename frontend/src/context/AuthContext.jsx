@@ -14,9 +14,8 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [loading, setLoading] = useState(true); // Start with true for initial auth check
+  const [loading, setLoading] = useState(true);
 
-  // Check for existing session on mount
   useEffect(() => {
     const checkAuth = async () => {
       try {
@@ -25,7 +24,6 @@ export const AuthProvider = ({ children }) => {
         setUser({ email, role, isWhitelisted });
         setIsAuthenticated(true);
       } catch (error) {
-        // No valid session, user stays logged out
         setUser(null);
         setIsAuthenticated(false);
       } finally {
@@ -43,7 +41,6 @@ export const AuthProvider = ({ children }) => {
         ? await adminLoginAPI(email, password)
         : await loginAPI(email, password);
       
-      // Fetch user data after successful login
       const meResponse = await getMe();
       const { role, isWhitelisted } = meResponse.data;
       setUser({ email, role, isWhitelisted });
@@ -64,7 +61,6 @@ export const AuthProvider = ({ children }) => {
       setLoading(true);
       const response = await signupAPI(email, password);
       
-      // Fetch user data after successful signup
       const meResponse = await getMe();
       const { role, isWhitelisted } = meResponse.data;
       setUser({ email, role, isWhitelisted });
@@ -88,7 +84,6 @@ export const AuthProvider = ({ children }) => {
       return { success: true };
     } catch (error) {
       console.error('Logout error:', error);
-      // Still clear local state even if API call fails
       setUser(null);
       setIsAuthenticated(false);
       return { success: true };

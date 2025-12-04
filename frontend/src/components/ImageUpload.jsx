@@ -55,7 +55,6 @@ export default function ImageUpload({ onImageSelect, theme }) {
 
   return (
     <div className="flex flex-col items-center gap-4">
-      {/* Hidden file input */}
       <input
         ref={fileInputRef}
         type="file"
@@ -64,7 +63,6 @@ export default function ImageUpload({ onImageSelect, theme }) {
         className="hidden"
       />
       
-      {/* Drag & Drop Area with Browse Button Inside */}
       <div
         onDragEnter={handleDragEnter}
         onDragOver={handleDragOver}

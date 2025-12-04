@@ -70,10 +70,8 @@ export default function Auth() {
 
   return (
     <div className="w-[100vw] h-[100vh] relative bg-[#0f172a] overflow-hidden">
-      {/* Particle Background */}
       <ParticleBackground />
       
-      {/* Content Layer - with z-index to appear above particles */}
       <div className="relative z-10">
         <img
           className="w-[38vw] h-[78vh] left-[20vw] top-[11vh] absolute object-fill rounded-tl-[5.21vw] rounded-bl-[5.21vw] rounded-bl-3xl object-cover shadow-2xl"
@@ -81,20 +79,16 @@ export default function Auth() {
         />
         <div className="w-[20vw] h-[78vh] left-[58vw] top-[11vh] absolute bg-gradient-to-br from-[#acc2e0] to-[#8FA8C8] rounded-tr-3xl rounded-br-3xl shadow-2xl" />
         
-        {/* Logo and Title */}
         <div className="flex w-[15vw] h-[5.93vh] left-[60.5vw] top-[18vh] absolute justify-center items-center text-sky-950 text-4xl font-extrabold font-['Inter'] gap-2">
           <img src="src/assets/isro_logo.png" alt="isro image" />
           AstraVLM
         </div>
 
-      {/* Subtitle */}
       <div className="w-[15vw] left-[60.5vw] top-[26vh] absolute text-center text-sky-950 text-base font-normal font-['JetBrains_Mono'] leading-snug">
         {isSignup ? 'Create your account to save your chats!' : 'Your AI Partner for Satellite Image Understanding!'}
       </div>
 
-      {/* Login/Signup Toggle */}
       <div className="w-[15vw] h-[4.5vh] left-[60.5vw] top-[35vh] absolute flex rounded-xl bg-sky-950/10 backdrop-blur-sm p-1 shadow-sm relative">
-        {/* Sliding Background Indicator */}
         <div 
           className="absolute left-1 top-1 bottom-1 w-[calc(50%-4px)] bg-sky-950 rounded-lg shadow-md transition-transform duration-300 ease-in-out" 
           style={{ transform: isSignup ? 'translateX(100%)' : 'translateX(0%)' }}
@@ -117,7 +111,6 @@ export default function Auth() {
         </button>
       </div>
 
-      {/* Email Input */}
       <input
         type="email"
         placeholder={isSignup ? "Email (must be whitelisted)" : "Email"}
@@ -128,7 +121,6 @@ export default function Auth() {
         style={{ top: isSignup ? '42vh' : '45vh' }}
       />
 
-      {/* Password Input */}
       <input
         type="password"
         placeholder={isSignup ? "Password (min 6 chars)" : "Password"}
@@ -139,7 +131,6 @@ export default function Auth() {
         style={{ top: isSignup ? '48vh' : '51vh' }}
       />
 
-      {/* Confirm Password Input - Only for Signup */}
       {isSignup && (
         <input
           type="password"
@@ -151,7 +142,6 @@ export default function Auth() {
         />
       )}
 
-      {/* Error Message */}
       {error && (
         <div 
           className="left-[60.5vw] absolute text-red-600 text-xs font-semibold bg-red-50 px-3 py-1.5 rounded-lg shadow-sm max-w-[15vw]"
@@ -161,7 +151,6 @@ export default function Auth() {
         </div>
       )}
 
-      {/* Submit Button */}
       <button
         onClick={handleSubmit}
         disabled={loading}
@@ -171,7 +160,6 @@ export default function Auth() {
         {loading ? (isSignup ? 'Signing up...' : 'Logging in...') : (isSignup ? 'Sign Up' : 'Login')}
       </button>
 
-      {/* Continue as Guest */}
       <button
         onClick={handleGuestMode}
         className="w-[15vw] h-[4.5vh] left-[60.5vw] top-[69vh] absolute bg-blue-600 hover:bg-blue-700 active:bg-blue-800 rounded-xl text-white text-sm font-semibold transition-all cursor-pointer shadow-md hover:shadow-lg active:scale-[0.98]"

@@ -75,7 +75,6 @@ export default function ShareModal({ isOpen, onClose, chatId, onShare, onRevoke,
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
       <div className={`${bgColor} rounded-xl shadow-2xl w-full max-w-md mx-4 border ${borderColor}`}>
-        {/* Header */}
         <div className={`flex items-center justify-between p-4 border-b ${borderColor}`}>
           <h2 className={`text-lg font-semibold ${textColor}`}>Share Chat</h2>
           <button
@@ -86,11 +85,9 @@ export default function ShareModal({ isOpen, onClose, chatId, onShare, onRevoke,
           </button>
         </div>
 
-        {/* Content */}
         <div className="p-4 space-y-4">
           {!isShared ? (
             <>
-              {/* Permission Selection */}
               <div>
                 <label className={`block text-sm font-medium ${textColor} mb-2`}>
                   Choose permission level
@@ -134,7 +131,6 @@ export default function ShareModal({ isOpen, onClose, chatId, onShare, onRevoke,
                 </div>
               </div>
 
-              {/* Generate Button */}
               <button
                 onClick={handleGenerateLink}
                 disabled={isGenerating}
@@ -149,7 +145,6 @@ export default function ShareModal({ isOpen, onClose, chatId, onShare, onRevoke,
             </>
           ) : (
             <>
-              {/* Share Link Display */}
               <div>
                 <label className={`block text-sm font-medium ${textColor} mb-2`}>
                   Share link
@@ -178,7 +173,6 @@ export default function ShareModal({ isOpen, onClose, chatId, onShare, onRevoke,
                 </p>
               </div>
 
-              {/* Action Buttons */}
               <div className="flex gap-2">
                 <button
                   onClick={handleChangePermission}

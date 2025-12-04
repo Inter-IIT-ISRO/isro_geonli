@@ -48,20 +48,16 @@ export default function Signup() {
       />
       <div className="w-[20vw] h-[78vh] left-[58vw] top-[11vh] absolute bg-gradient-to-br from-[#acc2e0] to-[#8FA8C8] rounded-tr-3xl rounded-br-3xl shadow-2xl" />
       
-      {/* Logo and Title */}
       <div className="flex w-[15vw] h-[5.93vh] left-[60.5vw] top-[18vh] absolute justify-center items-center text-sky-950 text-4xl font-extrabold font-['Inter'] gap-2">
         <img src="src/assets/isro_logo.png" alt="isro image" />
         AstraVLM
       </div>
 
-      {/* Subtitle */}
       <div className="w-[15vw] left-[60.5vw] top-[26vh] absolute text-center text-sky-950 text-base font-normal font-['JetBrains_Mono'] leading-snug">
         Create your account to save your chats!
       </div>
 
-      {/* Login/Signup Toggle */}
       <div className="w-[15vw] h-[4.5vh] left-[60.5vw] top-[35vh] absolute flex rounded-xl bg-sky-950/10 backdrop-blur-sm p-1 shadow-sm relative">
-        {/* Sliding Background Indicator */}
         <div className="absolute left-1 top-1 bottom-1 w-[calc(50%-4px)] bg-sky-950 rounded-lg shadow-md transition-transform duration-300 ease-in-out" 
              style={{ transform: 'translateX(100%)' }}
         />
@@ -76,7 +72,6 @@ export default function Signup() {
         </div>
       </div>
 
-      {/* Email Input */}
       <input
         type="email"
         placeholder="Email (must be whitelisted)"
@@ -85,7 +80,6 @@ export default function Signup() {
         className="w-[15vw] h-[5vh] left-[60.5vw] top-[42vh] absolute px-4 py-2 rounded-xl border-2 border-gray-300 text-gray-800 text-sm focus:outline-none focus:border-sky-950 focus:ring-2 focus:ring-sky-950/20 transition-all shadow-sm"
       />
 
-      {/* Password Input */}
       <input
         type="password"
         placeholder="Password (min 6 chars)"
@@ -94,7 +88,6 @@ export default function Signup() {
         className="w-[15vw] h-[5vh] left-[60.5vw] top-[48vh] absolute px-4 py-2 rounded-xl border-2 border-gray-300 text-gray-800 text-sm focus:outline-none focus:border-sky-950 focus:ring-2 focus:ring-sky-950/20 transition-all shadow-sm"
       />
 
-      {/* Confirm Password Input */}
       <input
         type="password"
         placeholder="Confirm Password"
@@ -104,14 +97,12 @@ export default function Signup() {
         className="w-[15vw] h-[5vh] left-[60.5vw] top-[54vh] absolute px-4 py-2 rounded-xl border-2 border-gray-300 text-gray-800 text-sm focus:outline-none focus:border-sky-950 focus:ring-2 focus:ring-sky-950/20 transition-all shadow-sm"
       />
 
-      {/* Error Message */}
       {error && (
         <div className="left-[60.5vw] top-[60vh] absolute text-red-600 text-xs font-semibold bg-red-50 px-3 py-1.5 rounded-lg shadow-sm max-w-[15vw]">
           {error}
         </div>
       )}
 
-      {/* Signup Button */}
       <button
         onClick={handleSignup}
         disabled={loading}
@@ -120,7 +111,6 @@ export default function Signup() {
         {loading ? 'Signing up...' : 'Sign Up'}
       </button>
 
-      {/* Continue as Guest */}
       <button
         onClick={handleGuestMode}
         className="w-[15vw] h-[4.5vh] left-[60.5vw] top-[69vh] absolute bg-blue-600 hover:bg-blue-700 active:bg-blue-800 rounded-xl text-white text-sm font-semibold transition-all cursor-pointer shadow-md hover:shadow-lg active:scale-[0.98]"
