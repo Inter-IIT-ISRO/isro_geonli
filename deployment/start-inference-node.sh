@@ -23,8 +23,8 @@ run_if_not_exists() {
 
 echo "--- Initializing Inference Nodes ---"
 
-run_if_not_exists "isro_qwen" "3000" "isro_qwen" "../inference/qwen"
-run_if_not_exists "isro_sam" "8000" "isro_sam" "../inference/sam3"
+run_if_not_exists "qwen" "3000" "qwen" "../inference/qwen"
+run_if_not_exists "sam" "8000" "sam" "../inference/sam3"
 
 echo ""
 echo "✅ Inference nodes are active."
