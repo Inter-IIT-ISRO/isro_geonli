@@ -1,6 +1,10 @@
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 import torch
 
+bert_model_subtype_dir = "bert_model_subtype"
+bert_tokenizer = AutoTokenizer.from_pretrained(bert_model_subtype_dir, use_fast=True)
+device = "cuda" if torch.cuda.is_available() else "cpu"
+
 def classify_query(text , model , idx2label):
   inputs = bert_tokenizer(
       text,
