@@ -36,6 +36,7 @@ export default function MainChat() {
   const [menuAnchorRect, setMenuAnchorRect] = useState(null);
   const [menuPlacement, setMenuPlacement] = useState('down');
   const [showShareModal, setShowShareModal] = useState(false);
+  const [currentShareInfo, setCurrentShareInfo] = useState({ shareToken: null, sharePermission: 'none' });
   
   const { isAuthenticated, logout, user } = useAuth();
   const navigate = useNavigate();
@@ -130,6 +131,7 @@ export default function MainChat() {
       setCurrentImageUrl(chatResponse.data.image_url || null);
       setCurrentChatTitle('Untitled Chat');
       setChatHistory(chatResponse.data.chat && chatResponse.data.chat.chats ? chatResponse.data.chat.chats : []);
+      setCurrentShareInfo({ shareToken: null, sharePermission: 'none' }); // New chat is not shared
       
       navigate(`/chat/${chatId}`, { replace: true });
       
@@ -237,7 +239,6 @@ export default function MainChat() {
           completed = true;
           
           const data = JSON.parse(event.data);
-          // Use local queryStartTime instead of state
           const responseTime = ((Date.now() - queryStartTime) / 1000).toFixed(1);
           const currentReasoningTime = reasoningEndTime || (reasoning && reasoningStartTime ? ((Date.now() - reasoningStartTime) / 1000).toFixed(1) : null);
           
@@ -344,6 +345,10 @@ export default function MainChat() {
       setCurrentImageUrl(response.data.image_url || null);
       setCurrentChatTitle(response.data.chat?.description || 'Untitled Chat');
       setChatHistory(response.data.chat && response.data.chat.chats ? response.data.chat.chats : []);
+      setCurrentShareInfo({
+        shareToken: response.data.chat?.shareToken || null,
+        sharePermission: response.data.chat?.sharePermission || 'none'
+      });
       setShowLoginPrompt(false);
       navigate(`/chat/${chatId}`, { replace: true });
     } catch (error) {
@@ -384,6 +389,10 @@ export default function MainChat() {
   const handleShare = async (chatId, permission) => {
     try {
       const response = await shareChat(chatId, permission);
+      setCurrentShareInfo({
+        shareToken: response.data.shareToken,
+        sharePermission: permission
+      });
       return response.data.shareUrl;
     } catch (error) {
       console.error('Failed to share chat:', error);
@@ -395,6 +404,7 @@ export default function MainChat() {
   const handleRevokeShare = async (chatId) => {
     try {
       await revokeShare(chatId);
+      setCurrentShareInfo({ shareToken: null, sharePermission: 'none' });
       setShowShareModal(false);
     } catch (error) {
       console.error('Failed to revoke share:', error);
@@ -587,6 +597,7 @@ export default function MainChat() {
           chatId={currentChatId}
           onShare={handleShare}
           onRevoke={handleRevokeShare}
+          initialShareInfo={currentShareInfo}
           theme={theme}
         />
 

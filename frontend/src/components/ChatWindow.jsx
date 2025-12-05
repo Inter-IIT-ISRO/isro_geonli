@@ -1,9 +1,19 @@
-import React, { useState, useEffect, useRef, useMemo } from "react";
+import React, { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { IoSend, IoDownload, IoChevronDown, IoChevronUp, IoLocationSharp, IoChatbubbleEllipses, IoCopyOutline, IoCheckmark } from "react-icons/io5";
 import { RiShareForwardLine, RiRobot2Fill } from "react-icons/ri";
 import { BiLoaderAlt } from "react-icons/bi";
 import { AiOutlineClockCircle } from "react-icons/ai";
 import { BsChatDotsFill } from "react-icons/bs";
+import { HiSparkles } from "react-icons/hi2";
+
+const sampleQuestions = [
+  "Identify water bodies in this image",
+  "What is the land cover distribution?",
+  "Show me agricultural regions",
+  "Detect urban areas",
+  "Find forest coverage",
+  "Identify roads and infrastructure",
+];
 
 export default function ChatWindow({ 
   chatId, 
@@ -26,6 +36,10 @@ export default function ChatWindow({
   const imageRef = useRef(null);
   const responseRefs = useRef([]);
   const [expandedThinking, setExpandedThinking] = useState({});
+  const marqueeRef = useRef(null);
+  const marqueeContentRef = useRef(null);
+  const marqueeScrollPos = useRef(0);
+  const [isHovering, setIsHovering] = useState(false);
 
   const [naturalSize, setNaturalSize] = useState({ w: 0, h: 0 });
   const [displaySize, setDisplaySize] = useState({ w: 0, h: 0 });
@@ -158,7 +172,7 @@ export default function ChatWindow({
     setSelectedIndex(lastIdx);
   }, [chatHistory]);
 
-  const updateImageMetrics = () => {
+  const updateImageMetrics = useCallback(() => {
     const img = imageRef.current;
     const container = imageContainerRef.current;
     if (!img || !container) return;
@@ -167,16 +181,21 @@ export default function ChatWindow({
     const natH = img.naturalHeight || 0;
     setNaturalSize({ w: natW, h: natH });
 
-    const rect = img.getBoundingClientRect();
-    const contRect = container.getBoundingClientRect();
-    const dispW = Math.round(rect.width);
-    const dispH = Math.round(rect.height);
+    if (!natW || !natH) return;
+
+    const dispW = img.offsetWidth;
+    const dispH = img.offsetHeight;
     setDisplaySize({ w: dispW, h: dispH });
 
-    const offX = Math.round(rect.left - contRect.left);
-    const offY = Math.round(rect.top - contRect.top);
+    const contRect = container.getBoundingClientRect();
+    const inset = 16; 
+    const wrapperW = contRect.width - (inset * 2);
+    const wrapperH = contRect.height - (inset * 2);
+
+    const offX = Math.round(inset + (wrapperW - dispW) / 2);
+    const offY = Math.round(inset + (wrapperH - dispH) / 2);
     setImageOffset({ x: offX, y: offY });
-  };
+  }, []);
 
   useEffect(() => {
     const handleResize = () => updateImageMetrics();
@@ -197,7 +216,54 @@ export default function ChatWindow({
       window.removeEventListener('resize', handleResize);
       resizeObserver.disconnect();
     };
-  }, []);
+  }, [updateImageMetrics]);
+
+  useEffect(() => {
+    if (chatHistory.length > 0) return; 
+    
+    const marquee = marqueeRef.current;
+    const content = marqueeContentRef.current;
+    if (!marquee || !content) return;
+
+    let animationId;
+    const speed = 0.2; 
+
+    const animate = () => {
+      if (!isHovering && marquee && content) {
+        marqueeScrollPos.current += speed;
+        const halfWidth = content.scrollWidth / 2;
+        
+        if (marqueeScrollPos.current >= halfWidth) {
+          marqueeScrollPos.current = 0;
+        }
+        
+        marquee.scrollLeft = marqueeScrollPos.current;
+      }
+      animationId = requestAnimationFrame(animate);
+    };
+
+    const handleScroll = () => {
+      if (!content) return;
+      const halfWidth = content.scrollWidth / 2;
+      
+      if (marquee.scrollLeft >= halfWidth) {
+        marquee.scrollLeft = 0;
+        marqueeScrollPos.current = 0;
+      } else if (marquee.scrollLeft <= 0 && marqueeScrollPos.current > 0) {
+        marquee.scrollLeft = halfWidth - 1;
+        marqueeScrollPos.current = halfWidth - 1;
+      }
+      marqueeScrollPos.current = marquee.scrollLeft;
+    };
+
+    marquee.addEventListener('scroll', handleScroll);
+    animationId = requestAnimationFrame(animate);
+
+    return () => {
+      cancelAnimationFrame(animationId);
+      marquee.removeEventListener('scroll', handleScroll);
+    };
+  }, [chatHistory.length, isHovering]);
 
   const handleWheel = (e) => {
     e.preventDefault();
@@ -290,6 +356,7 @@ export default function ChatWindow({
 
     const handleEnd = () => {
       setIsResizing(false);
+      updateImageMetrics();
     };
 
     document.addEventListener('mousemove', handleMove);
@@ -299,7 +366,7 @@ export default function ChatWindow({
       document.removeEventListener('mousemove', handleMove);
       document.removeEventListener('mouseup', handleEnd);
     };
-  }, [isResizing]);
+  }, [isResizing, updateImageMetrics]);
 
   const handleSend = () => {
     if (query.trim() && canSend && !isGenerating && onSendMessage) {
@@ -326,7 +393,7 @@ export default function ChatWindow({
   const handleTextareaChange = (e) => {
     setQuery(e.target.value);
     e.target.style.height = 'auto';
-    e.target.style.height = Math.min(e.target.scrollHeight, 200) + 'px'; // Max 200px height
+    e.target.style.height = Math.min(e.target.scrollHeight, 200) + 'px'; 
   };
 
   const latestBoxes = useMemo(() => {
@@ -489,7 +556,6 @@ export default function ChatWindow({
     try {
       const msg = chatHistory[idx];
       if (!msg || !msg.bounding_boxes || !imageUrl) return;
-      // Load image
       const img = new Image();
       img.crossOrigin = 'anonymous';
       const loaded = await new Promise((resolve, reject) => {
@@ -844,6 +910,47 @@ export default function ChatWindow({
 
         {onSendMessage && (
           <div className={`flex-shrink-0 px-4 pb-3 pt-2.5 ${theme === 'dark' ? 'bg-neutral-900/80' : 'bg-gray-50/80'} backdrop-blur-sm`}>
+            {chatHistory.length === 0 && (
+              <div className="max-w-3xl mx-auto mb-3">
+                <div className="flex items-center gap-2 mb-2">
+                  <HiSparkles className={`w-4 h-4 ${theme === 'dark' ? 'text-yellow-400' : 'text-yellow-500'}`} />
+                  <span className={`text-xs font-medium ${theme === 'dark' ? 'text-slate-400' : 'text-gray-500'}`}>
+                    Try asking
+                  </span>
+                </div>
+                <div 
+                  ref={marqueeRef}
+                  className="overflow-x-auto"
+                  style={{ 
+                    scrollbarWidth: 'none', 
+                    msOverflowStyle: 'none',
+                  }}
+                  onMouseEnter={() => setIsHovering(true)}
+                  onMouseLeave={() => setIsHovering(false)}
+                >
+                  <style>{`
+                    .marquee-container::-webkit-scrollbar {
+                      display: none;
+                    }
+                  `}</style>
+                  <div ref={marqueeContentRef} className="flex gap-3 marquee-container" style={{ width: 'max-content' }}>
+                    {[...sampleQuestions, ...sampleQuestions].map((question, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => setQuery(question)}
+                        className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 border whitespace-nowrap ${
+                          theme === 'dark' 
+                            ? 'bg-slate-800/60 hover:bg-slate-700 border-slate-600/50 text-slate-300 hover:text-white hover:border-slate-500' 
+                            : 'bg-white hover:bg-gray-100 border-gray-200 text-gray-600 hover:text-gray-900 hover:border-gray-300'
+                        } hover:scale-[1.02] active:scale-[0.98]`}
+                      >
+                        {question}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
             <div className="max-w-3xl mx-auto flex gap-2 w-full items-end">
               <textarea
                 ref={textareaRef}

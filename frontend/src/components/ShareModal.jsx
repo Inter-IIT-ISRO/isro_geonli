@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { IoClose, IoCopy, IoCheckmark } from 'react-icons/io5';
 import { MdRemoveRedEye, MdEdit } from 'react-icons/md';
 
-export default function ShareModal({ isOpen, onClose, chatId, onShare, onRevoke, theme }) {
+export default function ShareModal({ isOpen, onClose, chatId, onShare, onRevoke, initialShareInfo, theme }) {
   const [permission, setPermission] = useState('view');
   const [shareUrl, setShareUrl] = useState('');
   const [isShared, setIsShared] = useState(false);
@@ -18,12 +18,20 @@ export default function ShareModal({ isOpen, onClose, chatId, onShare, onRevoke,
   const selectedBg = theme === "dark" ? "bg-blue-900/50" : "bg-blue-100";
 
   useEffect(() => {
-    if (!isOpen) {
-      setShareUrl('');
-      setIsShared(false);
+    if (isOpen && initialShareInfo) {
+      if (initialShareInfo.shareToken && initialShareInfo.sharePermission !== 'none') {
+        setIsShared(true);
+        setPermission(initialShareInfo.sharePermission);
+        const baseUrl = window.location.origin;
+        setShareUrl(`${baseUrl}/shared/${initialShareInfo.shareToken}`);
+      } else {
+        setIsShared(false);
+        setShareUrl('');
+        setPermission('view');
+      }
       setCopied(false);
     }
-  }, [isOpen]);
+  }, [isOpen, initialShareInfo]);
 
   const handleGenerateLink = async () => {
     setIsGenerating(true);
@@ -50,6 +58,7 @@ export default function ShareModal({ isOpen, onClose, chatId, onShare, onRevoke,
       setShareUrl('');
       setIsShared(false);
       setCopied(false);
+      setPermission('view'); 
     } catch (error) {
       console.error('Failed to revoke access:', error);
     }
