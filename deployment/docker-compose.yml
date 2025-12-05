@@ -41,18 +41,12 @@ services:
       - /bin/sh
       - -c
       - |
-        # 1. Wait for MinIO to be ready
         until mc alias set myminio http://minio:9000 $$MINIO_ROOT_USER $$MINIO_ROOT_PASSWORD; do
           echo '...waiting for minio to start...'
           sleep 1
         done
-        
-        # 2. Create the bucket
         mc mb --ignore-existing myminio/$$MINIO_BUCKET
-        
-        # 3. Set policy to public
         mc anonymous set download myminio/$$MINIO_BUCKET
-        
         echo 'Bucket created successfully.'
         exit 0
 
@@ -67,18 +61,20 @@ services:
       JWT_SECRET: ${JWT_SECRET}
       MODE: production
       DB_NAME: ${MONGO_TARGET_DB}
-      # Use the GPU Machine IP provided in .env
-      INFERENCE_URL_SAM: "${GPU_MACHINE_IP}:${SAM_PORT}"
-      INFERENCE_URL_QWEN: "${GPU_MACHINE_IP}:${QWEN_PORT}"
+      # UPDATED: Using internal service names
+      INFERENCE_URL_SAM: "http://inference-sam:8000"
+      INFERENCE_URL_QWEN: "http://inference-qwen:3000"
       MINIO_ACCESS_KEY: ${MINIO_ROOT_USER}
       MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD}
-      MINIO_ENDPOINT: ${HOST_IP} # Public IP of this core machine
+      MINIO_ENDPOINT: ${HOST_IP} # Kept as HOST_IP because the frontend (browser) needs to reach MinIO too
       MINIO_PORT: 9000
       MINIO_BUCKET: ${MINIO_BUCKET}
       FRONTEND_URL: http://${HOST_IP}:5173
     depends_on:
       - mongodb
       - minio
+      - inference-qwen
+      - inference-sam
 
   frontend:
     build: ../frontend
@@ -90,10 +86,12 @@ services:
       VITE_API_BASE_URL: ${VITE_API_BASE_URL}
 
   inference-qwen:
-    build: ../isro_geonli/inference/qwen
+    build: ../inference/qwen
     container_name: isro_inference_qwen
     environment:
       PORT: 3000
+    volumes:
+      - ../inference/qwen/qwen_lora_model:/app/qwen_lora_model
     deploy:
       resources:
         reservations:
@@ -101,14 +99,18 @@ services:
             - driver: nvidia
               count: 1
               capabilities: [gpu]
-    network_mode: "host"
+    ports:
+      - "3000:3000"
     restart: always
 
   inference-sam:
-    build: ../isro_geonli/inference/sam3
+    build: ../inference/sam3
     container_name: isro_inference_sam
     environment:
       PORT: 8000
+    volumes:
+      - ../inference/sam3/sam_model:/app/sam_model
+      - ../inference/sam3/bert_model_subtype:/app/bert_model_subtype
     deploy:
       resources:
         reservations:
@@ -116,7 +118,8 @@ services:
             - driver: nvidia
               count: 1
               capabilities: [gpu]
-    network_mode: "host"
+    ports:
+      - "8000:8000"
     restart: always
 
 volumes:
