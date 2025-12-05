@@ -39,7 +39,7 @@ export default function Login() {
       
       <div className="flex w-[15vw] h-[5.93vh] left-[60.5vw] top-[18vh] absolute justify-center items-center text-sky-950 text-4xl font-extrabold font-['Inter'] gap-2">
         <img src="src/assets/isro_logo.png" alt="isro image" />
-        AstraVLM
+        GeoNLI
       </div>
 
       <div className="w-[15vw] left-[60.5vw] top-[26vh] absolute text-center text-sky-950 text-base font-normal font-['JetBrains_Mono'] leading-snug">

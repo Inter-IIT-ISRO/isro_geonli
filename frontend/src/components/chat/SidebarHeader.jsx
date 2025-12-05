@@ -28,7 +28,7 @@ export default function SidebarHeader({
               >
                 ISRO
               </div>
-              <span className={`${textColor} text-xl font-bold truncate`}>AstraVLM</span>
+              <span className={`${textColor} text-xl font-bold truncate`}>GeoNLI</span>
             </div>
             <button
               onClick={toggleSidebar}
