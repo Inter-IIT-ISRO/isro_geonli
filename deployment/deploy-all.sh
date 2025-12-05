@@ -1,13 +1,11 @@
 #!/bin/bash
 
-# Configuration
 ENV_FILE=".env"
 
 echo "=================================================="
 echo "   ISRO GeoNLI Single-Click Deployment"
 echo "=================================================="
 
-# --- 1. IP Configuration (Still needed for Frontend access) ---
 if [ ! -f "$ENV_FILE" ]; then
     echo "Creating .env file..."
     
@@ -50,11 +48,9 @@ else
     source "$ENV_FILE"
 fi
 
-# --- 2. Write Frontend ENV ---
 echo "Configuring Frontend..."
 echo "VITE_API_BASE_URL=http://$HOST_IP:5000/api" > "../frontend/.env"
 
-# --- 3. Download Models (Required) ---
 echo ""
 echo "--- Checking Inference Models ---"
 pip install gdown --quiet
@@ -83,7 +79,6 @@ ensure_dir "$TRANSFORMERS_DIR" "Huggingface Transformers" && git clone --depth 1
 QWEN_DIR="../inference/qwen/qwen_lora_model"
 ensure_dir "$QWEN_DIR" "Qwen LoRA" && gdown https://drive.google.com/drive/folders/1ez_3K-0Q3-6DIePvdH8x_lH1fjHGqFm1 -O "$QWEN_DIR" --folder
 
-# --- 4. Launch ---
 echo ""
 echo "--- Starting All Services ---"
 export HOST_IP VITE_API_BASE_URL

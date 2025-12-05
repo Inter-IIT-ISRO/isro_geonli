@@ -4,7 +4,7 @@ if (db.getCollection('users').countDocuments() === 0) {
     db.createCollection('users');
     db.users.insertOne({
         'email': 'admin@isro.gov.in',
-        'password': '', // You might want to hash a default password here using a script or set it manually later
+        'password': '',
         'role': 2,
         'isWhitelisted': true
     });

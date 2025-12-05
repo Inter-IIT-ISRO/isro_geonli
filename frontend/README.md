@@ -1,18 +1,32 @@
-# React + Vite
+# ISRO GeoNLI - Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This is the frontend client for the ISRO GeoNLI application, built with React and Vite. It provides a chat interface for users to interact with our models for inference.
 
-Currently, two official plugins are available:
+## 📂 File Structure
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## React Compiler
-
-The React Compiler is enabled on this template. See [this documentation](https://react.dev/learn/react-compiler) for more information.
-
-Note: This will impact Vite dev & build performances.
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+```text
+frontend/
+├── .dockerignore
+├── .gitignore
+├── Dockerfile                  # Docker build configuration
+├── README.md                   # Project documentation
+├── eslint.config.js           # Linting configuration
+├── index.html                  # Entry HTML file
+├── package.json               # Dependencies and scripts
+├── vite.config.js             # Vite configuration
+├── public/
+│   └── vite.svg
+└── src/
+    ├── assets/                # Static assets (images, logos)
+    ├── components/            # Reusable UI components
+    │   ├── chat/              # Chat-specific components (Sidebar, Message list, etc.)
+    │   ├── ImageUpload.jsx
+    │   ├── ParticleBackground.jsx
+    │   ├── ProtectedRoute.jsx
+    │   └── ...
+    ├── context/               # React Context (AuthContext)
+    ├── pages/                 # Page components (Login, MainChat, AdminDashboard)
+    ├── services/              # API service functions (axios instances)
+    ├── App.jsx                # Main App component
+    ├── main.jsx               # Application entry point
+    └── index.css              # Global styles
