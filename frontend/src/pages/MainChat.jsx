@@ -581,12 +581,12 @@ export default function MainChat() {
               imageUrl={currentImageUrl}
               chatTitle={currentChatTitle}
               chatHistory={chatHistory} 
-              onSendMessage={handleSendMessage} 
+              onSendMessage={handleSendMessage}
               isGenerating={isGenerating}
               elapsedTime={elapsedTime}
               lastResponseTime={lastResponseTime}
               onShareClick={handleShareClick}
-              theme={theme} 
+              theme={theme}
             />
           </div>
         )}
