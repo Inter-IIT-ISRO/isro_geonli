@@ -6,6 +6,7 @@
 1. `git` installed
 1. `docker` and `docker-compose` installed
 1. `OS`: Linux
+1. Minimum GPU required: T4 with 15 GB VRAM
 
 **NO EXTERNAL API USED** and no dependency conflicts because of docker.
 
