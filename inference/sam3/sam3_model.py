@@ -116,41 +116,55 @@ class SAM_MODEL():
 
 
   def get_final_boxes(self,image, text):
-      results, semantic_seg = self.get_output(image, text)
-      instance_masks = results['masks'].cpu().numpy()
-      scores = results['scores'].float().cpu().numpy()
+    results, semantic_seg = self.get_output(image, text)
+    instance_masks = results['masks'].cpu().numpy()
+    scores = results['scores'].float().cpu().numpy()
 
-      instance_boxes = []
-      f_scores = []
-
-
-      for i, mask in enumerate(instance_masks):
-          box = self.mask_to_obb_all_coords(mask)
-          if box is not None:
-              instance_boxes.append(box)
-              f_scores.append(scores[i])
-
-      keep_boxes = self.nms_8point_opencv(instance_boxes, f_scores, 0.)
-      instance_boxes = [instance_boxes[i] for i in keep_boxes]
-
-      semantic_boxes = self.semantic_mask_to_obb(semantic_seg.float().cpu().numpy())
-
-      final_boxes = []
-
-      THRESHOLD = 0.5
-
-      for i_box in instance_boxes:
-          iob1_scores = []
-          for s_box in semantic_boxes:
-              iob1_scores.append(self.calculate_iob1(i_box.reshape(4, 2), s_box.reshape(4, 2)))
-          iob1_scores = np.array(iob1_scores)
+    instance_boxes = []
+    f_scores = []
 
 
-          if (iob1_scores>THRESHOLD).any():
-              final_boxes.append(i_box.tolist())
+    for i, mask in enumerate(instance_masks):
+        box = self.mask_to_obb_all_coords(mask)
+        if box is not None:
+            instance_boxes.append(box)
+            f_scores.append(scores[i])
+
+    keep_boxes = self.nms_8point_opencv(instance_boxes, f_scores, 0.)
+    instance_boxes = [instance_boxes[i] for i in keep_boxes]
+
+    semantic_boxes = self.semantic_mask_to_obb(semantic_seg.float().cpu().numpy())
+
+    final_boxes = []
+
+    THRESHOLD = 0.5
+
+    for i_box in instance_boxes:
+        iob1_scores = []
+        for s_box in semantic_boxes:
+            iob1_scores.append(self.calculate_iob1(i_box.reshape(4, 2), s_box.reshape(4, 2)))
+        iob1_scores = np.array(iob1_scores)
 
 
-      return final_boxes
+        if (iob1_scores>THRESHOLD).any():
+            final_boxes.append(i_box.tolist())
+
+    h, w = instance_masks.shape[:2]
+
+    normalized_final_boxes = []
+
+    for box in final_boxes:
+        box_arr = np.array(box, dtype=np.float32)
+        
+        box_arr[0::2] /= w
+        
+        box_arr[1::2] /= h
+        
+        box_arr = np.clip(box_arr, 0, 1)
+        
+        normalized_final_boxes.append(box_arr.tolist())
+
+    return normalized_final_boxes
 
 
 
