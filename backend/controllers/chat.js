@@ -167,80 +167,99 @@ export const chatStream = tryCatch(async (req, res, next) => {
         let bboxes = [];
 
         response.data.on('data', (chunk) => {
-            buffer += chunk.toString();
+            try {
+                buffer += chunk.toString();
+                while (true) {
+                    if (!currentMode) {
+                        const reasoningStart = buffer.indexOf('<REASONING>');
+                        const solutionStart = buffer.indexOf('<SOLUTION>');
+                        const errorStart = buffer.indexOf('<ERROR>');
 
-            while (true) {
-                if (!currentMode) {
-                    const reasoningStart = buffer.indexOf('<REASONING>');
-                    const solutionStart = buffer.indexOf('<SOLUTION>');
-                    const errorStart = buffer.indexOf('<ERROR>');
-
-                    if (errorStart !== -1) {
-                        const errorEnd = buffer.indexOf('</ERROR>');
-                        if (errorEnd !== -1) {
-                            const errorMsg = buffer.substring(errorStart + 7, errorEnd);
-                            res.write(`event: error\n`);
-                            res.write(`data: ${JSON.stringify(errorMsg)}\n\n`);
-                            res.end();
-                            return;
+                        if (errorStart !== -1) {
+                            const errorEnd = buffer.indexOf('</ERROR>');
+                            if (errorEnd !== -1) {
+                                const errorMsg = buffer.substring(errorStart + 7, errorEnd);
+                                res.write(`event: error\n`);
+                                res.write(`data: ${JSON.stringify(errorMsg)}\n\n`);
+                                res.end();
+                                return;
+                            }
+                            break;
+                        } else if (reasoningStart !== -1) {
+                            currentMode = 'reasoning';
+                            buffer = buffer.substring(reasoningStart + 11);
+                        } else if (solutionStart !== -1) {
+                            currentMode = 'solution';
+                            buffer = buffer.substring(solutionStart + 10);
+                        } else {
+                            break;
                         }
-                        break;
-                    } else if (reasoningStart !== -1) {
-                        currentMode = 'reasoning';
-                        buffer = buffer.substring(reasoningStart + 11);
-                    } else if (solutionStart !== -1) {
-                        currentMode = 'solution';
-                        buffer = buffer.substring(solutionStart + 10);
                     } else {
-                        break;
-                    }
-                } else {
-                    const endTag = currentMode === 'reasoning' ? '</REASONING>' : '</SOLUTION>';
-                    const endIndex = buffer.indexOf(endTag);
+                        const endTag = currentMode === 'reasoning' ? '</REASONING>' : '</SOLUTION>';
+                        const endIndex = buffer.indexOf(endTag);
 
-                    if (endIndex !== -1) {
-                        const content = buffer.substring(0, endIndex);
-                        if (content) {
-                            res.write(`event: ${currentMode}\n`);
-                            res.write(`data: ${JSON.stringify(content)}\n\n`);
+                        if (endIndex !== -1) {
+                            const content = buffer.substring(0, endIndex);
+                            if (content) {
+                                res.write(`event: ${currentMode}\n`);
+                                res.write(`data: ${JSON.stringify(content)}\n\n`);
 
-                            if (currentMode === 'reasoning') fullReasoning += content;
-                            if (currentMode === 'solution') fullSolution += content;
+                                if (currentMode === 'reasoning') fullReasoning += content;
+                                if (currentMode === 'solution') fullSolution += content;
+                            }
+                            buffer = buffer.substring(endIndex + endTag.length);
+                            currentMode = null;
+                        } else {
+                            if (buffer) {
+                                res.write(`event: ${currentMode}\n`);
+                                res.write(`data: ${JSON.stringify(buffer)}\n\n`);
+
+                                if (currentMode === 'reasoning') fullReasoning += buffer;
+                                if (currentMode === 'solution') fullSolution += buffer;
+
+                                buffer = '';
+                            }
+                            break;
                         }
-                        buffer = buffer.substring(endIndex + endTag.length);
-                        currentMode = null;
-                    } else {
-                        if (buffer) {
-                            res.write(`event: ${currentMode}\n`);
-                            res.write(`data: ${JSON.stringify(buffer)}\n\n`);
-
-                            if (currentMode === 'reasoning') fullReasoning += buffer;
-                            if (currentMode === 'solution') fullSolution += buffer;
-
-                            buffer = '';
-                        }
-                        break;
                     }
+                }
+            } catch (error) {
+                console.error('Error processing chunk:', error);
+                if (!res.writableEnded) {
+                    res.write(`event: error\n`);
+                    res.write(`data: ${JSON.stringify({ message: "Failed to process chunk" })}\n\n`);
+                    res.end();
                 }
             }
         });
 
         response.data.on('end', async () => {
-            const endTime = Date.now();
-            const responseTime = ((endTime - startTime) / 1000).toFixed(2);
+            try {
+                const endTime = Date.now();
+                const responseTime = ((endTime - startTime) / 1000).toFixed(2);
 
-            // Don't save times here - they will be updated from frontend
-            chat.chats.push({
-                query,
-                reasoning: fullReasoning.trim(),
-                response: fullSolution.trim(),
-                bounding_boxes: bboxes
-            });
-            await chat.save();
+                // Don't save times here - they will be updated from frontend
+                chat.chats.push({
+                    query,
+                    reasoning: fullReasoning.trim(),
+                    response: fullSolution.trim(),
+                    bounding_boxes: bboxes
+                });
+                
+                await chat.save();
 
-            res.write(`event: end\n`);
-            res.write(`data: ${JSON.stringify({ response_time: responseTime, bounding_boxes: bboxes })}\n\n`);
-            res.end();
+                res.write(`event: end\n`);
+                res.write(`data: ${JSON.stringify({ response_time: responseTime, bounding_boxes: bboxes })}\n\n`);
+                res.end();
+                
+            } catch (error) {
+                console.error("Error saving chat or ending stream:", error);
+                if (!res.writableEnded) {
+                    res.write(`event: error\n`);
+                    res.write(`data: ${JSON.stringify({ message: "Failed to save chat" })}\n\n`);
+                    res.end();
+                }
+            }
         });
 
         response.data.on('error', (error) => {
