@@ -157,7 +157,7 @@ export const chatStream = tryCatch(async (req, res, next) => {
                 history: chat.chats
             },
             responseType: 'stream',
-            timeout: 120000
+            timeout: 180000
         });
 
         let buffer = '';

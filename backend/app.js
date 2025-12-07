@@ -26,7 +26,13 @@ app.use("/api/evaluate", evaluationRouter);
 app.use("/api/chat", chatRouter);
 app.post("/api/classify", tryCatch(async (req, res) => {
     console.log("Received classify request:", req.body, process.env.INFERENCE_URL_QWEN);
-    res.status(200).json((await axios.post(process.env.INFERENCE_URL_QWEN + '/inference', { image_url: req.body.image_url, query: req.body.query, category: "classify" })).data);
+    res.status(200).json((await axios.post(process.env.INFERENCE_URL_QWEN + '/inference', { image_url: req.body.image_url, query: req.body.query, category: "classify" }, {
+            proxy: false, 
+            timeout: 180000,
+            headers: {
+                'Connection': 'keep-alive'
+            }
+        })).data);
 }));
 
 app.get("/", (_, res) => {

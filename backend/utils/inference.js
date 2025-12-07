@@ -149,7 +149,13 @@ export const inference = async (inference_url, image_url, query, history, catego
         await axios.post(
             inference_url + '/inference',
             payload,
-            { timeout: 120000 } // 120 seconds
+            {
+                proxy: false, 
+                timeout: 180000,
+                headers: {
+                    'Connection': 'keep-alive'
+                }
+            }
         )
     ).data;
 };

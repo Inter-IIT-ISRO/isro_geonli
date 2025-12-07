@@ -6,12 +6,24 @@ export const getResponse = tryCatch(async (req, res, _, inference) => {
     const { image_url, metadata } = body.input_image;
     const captioning = await inference(process.env.INFERENCE_URL_QWEN, image_url, body.queries.caption_query.instruction, [], "captioning");
 
-    let transformed_query = (await axios.post(process.env.INFERENCE_URL_QWEN + '/inference', { image_url, query: body.queries.grounding_query.instruction, category: "classify" })).data.transformed_query
+    let transformed_query = (await axios.post(process.env.INFERENCE_URL_QWEN + '/inference', { image_url, query: body.queries.grounding_query.instruction, category: "classify" }, {
+            proxy: false, 
+            timeout: 180000,
+            headers: {
+                'Connection': 'keep-alive'
+            }
+        })).data.transformed_query
     const grounding = await inference(process.env.INFERENCE_URL_SAM, image_url, body.queries.grounding_query.instruction, [], "grounding", NaN, transformed_query);
     console.log("Response: ", grounding)
     const vqa_binary = await inference(process.env.INFERENCE_URL_QWEN, image_url, body.queries.attribute_query.binary.instruction, [], "vqa_binary");
 
-    transformed_query = (await axios.post(process.env.INFERENCE_URL_QWEN + '/inference', { image_url, query: body.queries.attribute_query.numeric.instruction, category: "classify" })).data.transformed_query
+    transformed_query = (await axios.post(process.env.INFERENCE_URL_QWEN + '/inference', { image_url, query: body.queries.attribute_query.numeric.instruction, category: "classify" }, {
+            proxy: false, 
+            timeout: 180000,
+            headers: {
+                'Connection': 'keep-alive'
+            }
+        })).data.transformed_query
     const vqa_numeric = await inference(process.env.INFERENCE_URL_SAM, image_url, body.queries.attribute_query.numeric.instruction, [], "vqa_numeric", metadata.spatial_resolution_m, transformed_query);
     const vqa_semantic = await inference(process.env.INFERENCE_URL_QWEN, image_url, body.queries.attribute_query.semantic.instruction, [], "vqa_semantic");
 
