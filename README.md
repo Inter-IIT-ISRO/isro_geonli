@@ -1,3 +1,8 @@
+# Demonstration video
+
+https://github.com/user-attachments/assets/c01de232-df72-4950-800f-897b2a225487
+
+
 # Deployment Guide
 
 ## Prerequisites:
@@ -50,4 +55,5 @@ cd deployment
 
 ## Limitation:
 Only 1 user can use the platform at a time because of the GPU resource limitation. But it is scalable to much larger scale if GPU is available.
+
 
